@@ -36,10 +36,10 @@ export class HomeworkDetails extends Component {
     return (
       <form onSubmit={this.handleSubmit}>
         <label htmlFor="number">Number
-          <input name="number" type="text" disabled value={this.state.number}/>
+          <input name="number" type="text" disabled value={this.state.number} />
         </label>
         <label htmlFor="title">Title
-          <input name="title" type="text" value={this.state.title} onChange={this.handleTitleChange}/>
+          <input name="title" type="text" value={this.state.title} onChange={this.handleTitleChange} />
         </label>
         <label htmlFor="description">Description
           <textarea name="description" type="text" rows="15" value={this.state.description} onChange={this.handleDescriptionChange}></textarea>

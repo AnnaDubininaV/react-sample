@@ -1,49 +1,35 @@
 import React, { Component } from 'react';
 import { Link, Route } from 'react-router-dom';
-import { find, reject, findIndex } from 'lodash';
+import { find } from 'lodash';
 
 import './App.css';
 import { ListItem, HomeworkDetails } from '..';
-
-const BACKEND_SERVER = 'https://promise-server.herokuapp.com';
-// const BACKEND_SERVER = 'http://localhost:5000';
+import { HomeworkService } from '../../services/homework.service';
 
 export class App extends Component {
   state = {
-    homeworks: []
+    homeworks: [],
+    homeworkService: {}
   }
 
   async componentDidMount() {
-    const homeworks = await (await fetch(`${BACKEND_SERVER}/api/homeworks`)).json();
+    await this.setState({ homeworkService: new HomeworkService()});
+    const homeworks = await this.state.homeworkService.fetchList();    
     this.setState({ homeworks });
-  }
+   }
 
   handleAction = async (action) => {
     switch(action.type) {
-
       case 'delete':
         try {
-          const req = await fetch(`${BACKEND_SERVER}/api/homeworks/${action.value.id}`, {
-            method: 'DELETE'
-          });
-          await req.json();
-          this.setState({ homeworks: reject(this.state.homeworks, { id: action.value.id }) });
+          const updatedHw =  await this.state.homeworkService.deleteOne(action.value.id);
+          this.setState({ homeworks:  updatedHw});      
         } catch (ignore) { }
         break;
-
       case 'update':
-        try {
-          const req = await fetch(`${BACKEND_SERVER}/api/homeworks/${action.value.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(action.value)
-          });
-          const result = await req.json();
-          const index = findIndex(this.state.homeworks, { id: result.id });
-          if (index > -1) {
-            const newHomeworks = [...this.state.homeworks];
-            newHomeworks[index] = result;
-            this.setState({ homeworks: newHomeworks });
-          }
+        try {          
+          const newHomeworks = await this.state.homeworkService.updateOne(action.value, this.state.homeworks);
+          this.setState({ homeworks: newHomeworks });          
         } catch (ignore) { }
         break;
 
